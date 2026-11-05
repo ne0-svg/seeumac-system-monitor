@@ -43,9 +43,17 @@ cat > "${APP}/Contents/Info.plist" <<'PLIST'
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
     <key>NSSupportsAutomaticTermination</key><false/>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
 </dict>
 </plist>
 PLIST
+
+echo "==> 拷贝图标"
+if [ -f "Resources/AppIcon.icns" ]; then
+    cp "Resources/AppIcon.icns" "${APP}/Contents/Resources/"
+else
+    echo "  (没有 Resources/AppIcon.icns，用系统默认图标)"
+fi
 
 echo "==> 本地签名"
 codesign --force --deep --sign - "${APP}" 2>&1 | grep -v "replacing existing" || true

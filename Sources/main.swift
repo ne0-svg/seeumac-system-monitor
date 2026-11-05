@@ -62,19 +62,24 @@ final class Monitor {
 
 enum TrayIcon {
     static func make(cpu: Double, mem: Double) -> NSImage {
-        let size = NSSize(width: 32, height: 18)
+        // 与 App 图标同一母题：三根柱子，最高那根用实心黑呼应橙色焦点。
+        // 柱宽/间距按图标 0.155 : 0.082 的比例换算到 6pt 宽。
+        let size = NSSize(width: 34, height: 18)
         let img = NSImage(size: size, flipped: false) { rect in
             let bars = [cpu, mem, max(cpu, mem)]
-            let barW: CGFloat = 5
-            let gap: CGFloat = 3.5
+            let barW: CGFloat = 6
+            let gap: CGFloat = 3.2
             let totalW = CGFloat(bars.count) * barW + CGFloat(bars.count - 1) * gap
             var x = (rect.width - totalW) / 2
             for (i, v) in bars.enumerated() {
                 let pct = min(1, max(0, v / 100))
-                let h = max(2.5, rect.height * 0.94 * CGFloat(pct))
+                // 最低高度 3pt，保证 0% 时仍然看得见一根
+                let h = max(3, rect.height * 0.94 * CGFloat(pct))
                 let r = NSRect(x: x, y: 1, width: barW, height: h)
-                let path = NSBezierPath(roundedRect: r, xRadius: 1.2, yRadius: 1.2)
-                NSColor.black.withAlphaComponent(i == 2 ? 1.0 : 0.68).setFill()
+                let radius = min(barW * 0.30, h / 2)
+                let path = NSBezierPath(roundedRect: r, xRadius: radius, yRadius: radius)
+                // 前两根半透明做层次，第三根（峰值）实心
+                NSColor.black.withAlphaComponent(i == 2 ? 1.0 : 0.65).setFill()
                 path.fill()
                 x += barW + gap
             }

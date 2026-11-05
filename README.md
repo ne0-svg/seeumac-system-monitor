@@ -4,6 +4,11 @@ A native macOS menu bar system monitor that does the one thing Activity Monitor 
 
 Written in pure AppKit. No dependencies, no Electron, ~300 KB, and it idles at **0.3–0.5% CPU**.
 
+<img src="docs/icon.png" width="112" align="left" hspace="20" vspace="6" alt="SeeUMac icon">
+
+**SeeUMac** &nbsp;·&nbsp; native macOS menu bar monitor
+<br clear="left">
+
 <img src="docs/screenshot.png" width="420" alt="SeeUMac panel">
 
 ---
@@ -15,6 +20,28 @@ I wanted to know why my M1 was running hot. Every monitor app shows you numbers 
 The interesting part turned out to be **which** process to kill. Electron apps spawn 5–8 helper processes; they look like noise in a flat process list. Killing one `Helper (Renderer)` does nothing useful. Killing the whole group does.
 
 So: aggregate by app, one row per app, one button to end all of it.
+
+---
+
+## The icon
+
+<img src="docs/icon.png" width="96" alt="SeeUMac icon">
+
+Three readings, one of them lit. The design borrows from three schools and takes one rule from each:
+
+- **Braun** — colour must carry meaning. There is exactly one accent in the whole mark, and it sits on the *highest* bar: it is not decoration, it is the reading that matters.
+- **Sony** — one focal point, everything else neutral. Two bars stay quiet so the third can speak.
+- **Apple** — a rounded container on a strict grid, still legible at 16 px. The bars are measured in a 0.175 : 0.075 : 0.220/0.335/0.455 ratio and the corners are cut to 0.12 × width — near-square, so the shapes read as instrument segments rather than capsules when downscaled.
+
+| | |
+|---|---|
+| Background | `#1E1E20` deep graphite |
+| Bars | `#F4F2ED` warm off-white |
+| Peak bar | `#E64E16` Braun orange |
+
+Regenerate with `python3 Tools/make_icon.py` — it writes `Resources/AppIcon.icns` (which `build.sh` bundles) and `docs/icon.png`.
+
+The menu bar icon is the same motif in template form: three bars, the two lower ones at 65% opacity, the peak solid. It follows the system's light/dark appearance automatically.
 
 ---
 
@@ -77,6 +104,8 @@ launchctl load ~/Library/LaunchAgents/com.seeumac.menubar.plist
 
 To build without installing: `./build.sh --no-install`
 
+Only if you want to regenerate the icon: `pip3 install Pillow`, then `python3 Tools/make_icon.py`. The prebuilt `.icns` is committed, so building does not need Python.
+
 ---
 
 ## Source layout
@@ -89,6 +118,8 @@ To build without installing: `./build.sh --no-install`
 | `Sources/ProcActions.swift` | App-level aggregation, process termination, icon caching |
 | `Sources/UIPanel.swift` | Custom-drawn controls: sparkline, bar, process row, tab buttons |
 | `Sources/main.swift` | Status bar item, panel window, app lifecycle |
+| `Tools/make_icon.py` | Generates the app icon (Pillow) |
+| `Resources/AppIcon.icns` | Bundled icon |
 
 ---
 
